@@ -8,6 +8,9 @@ config.read('dwh.cfg')
 
 
 def drop_tables(cur, conn):
+    """
+    Drops all tables in the redshift cluster.
+    """
     for query in drop_table_queries:
         try:
             cur.execute(query)
@@ -18,6 +21,9 @@ def drop_tables(cur, conn):
 
 
 def create_tables(cur, conn):
+    """
+    Creates all tables for the redshift cluster.
+    """
     for query in create_table_queries:
         try:
             cur.execute(query)
@@ -27,6 +33,11 @@ def create_tables(cur, conn):
 
 
 def main():
+    """
+    Connects to redshift cluster and then drops
+    and creates tables.
+    """
+
     config = configparser.ConfigParser()
     config.read('dwh.cfg')
 

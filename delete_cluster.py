@@ -9,7 +9,7 @@ config.read('dwh.cfg')
 
 def delete_cluster():
     """
-    Deletes Redshift cluster for project.
+    Deletes Redshift cluster.
     """
 
     try:

@@ -2,7 +2,6 @@ import boto3
 from botocore.exceptions import ClientError
 import logging
 import configparser
-import pandas as pd
 
 
 # CONFIG
@@ -15,7 +14,13 @@ def create_cluster() -> None:
     If cluster exists, error printed to terminal.
     """
 
-    redshift = boto3.client('redshift', region_name=config['REGION']['AWS_REGION'])
+    redshift = boto3.client(
+        'redshift', 
+        region_name=config['REGION']['AWS_REGION'],
+        aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
+        aws_secret_access_key=config['AWS']['SECRET_ACCESS_KEY'],
+        aws_session_token=config['AWS']['SESSION_TOKEN']
+        )
     try:
         redshift.create_cluster(
             ClusterType='multi-node',
@@ -36,7 +41,10 @@ def get_cluster_properties(cluster_id) -> dict:
     """
     Returns cluster properties of Redshift cluster based on id.
     """
-    redshift = boto3.client('redshift', region_name=config['REGION']['AWS_REGION'])
+    redshift = boto3.client('redshift', region_name=config['REGION']['AWS_REGION'],
+                            aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
+                            aws_secret_access_key=config['AWS']['SECRET_ACCESS_KEY'],
+                            aws_session_token=config['AWS']['SESSION_TOKEN'])
     try:
         cluster_props = redshift.describe_clusters(ClusterIdentifier=cluster_id)['Clusters'][0]
         return cluster_props
@@ -51,17 +59,24 @@ def enable_cluster_ingress(cluster_properties: dict) -> None:
     Modifies default VPC security group inbound rules.
     """
 
-    ec2 = boto3.resource('ec2', region_name=config['REGION']['AWS_REGION'])
+    ec2 = boto3.resource('ec2', region_name=config['REGION']['AWS_REGION'],
+                        aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
+                        aws_secret_access_key=config['AWS']['SECRET_ACCESS_KEY'],
+                        aws_session_token=config['AWS']['SESSION_TOKEN']
+    )
 
     try:
-        vpc = ec2.Vpc(id=cluster_properties['VpcId'])
+        vpc = ec2.Vpc(
+            id=cluster_properties['VpcId']
+            )
+            
         print(list(vpc.security_groups.all()))
         defaultSg = list(vpc.security_groups.all())[0]
         print(defaultSg)
         
         defaultSg.authorize_ingress(
-            CidrIp=config['SECURITY_GROUP']['INBOUND_IP'],  # TODO: fill out
-            IpProtocol=config['SECURITY_GROUP']['IP_PROTOCOL'],  # TODO: fill out
+            CidrIp=config['SECURITY_GROUP']['INBOUND_IP'],
+            IpProtocol=config['SECURITY_GROUP']['IP_PROTOCOL'],
             FromPort=int(config['CLUSTER']['DB_PORT']),
             ToPort=int(config['CLUSTER']['DB_PORT'])
         )
