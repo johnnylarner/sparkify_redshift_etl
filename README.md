@@ -11,7 +11,7 @@ tables and then transfers them again to into fact and dimension tables.
 3. Add config file
 4. Prestage the data stored in Udacity buckets by executing the prestage_data file
 5. Create a Redshift cluster by executing create_cluster.py
-    i.  This assumes you have an IAM Role with the correct access rights.
+    > his assumes you have an IAM Role with the correct access rights.
         If you don't have this, create an IAM Role and add its ARN to the config file.
 6. Create your tables on the Redshift nodes by executing create_tables.py
 7. Populate the staging and fact and dimension tables by executing etl.py
